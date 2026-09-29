@@ -1,0 +1,92 @@
+name: Parse
+options:
+  bundleIdPrefix: com.parse
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+  defaultConfig: Debug
+settings:
+  base:
+    MACOSX_DEPLOYMENT_TARGET: "26.0"
+    SWIFT_VERSION: "6.0"
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
+packages:
+  ParseCore:
+    path: ParseCore
+targets:
+  Parse:
+    type: application
+    platform: macOS
+    sources:
+      - path: ParseApp
+        excludes:
+          - "**/.DS_Store"
+          - Info.plist
+          - Parse.entitlements
+    dependencies:
+      - package: ParseCore
+        product: ParseCore
+    info:
+      path: ParseApp/Info.plist
+      properties:
+        CFBundleDisplayName: Parse
+        CFBundleShortVersionString: "0.1.0"
+        CFBundleVersion: "1"
+        LSUIElement: false
+        LSApplicationCategoryType: public.app-category.developer-tools
+        NSPrincipalClass: NSApplication
+        NSAppleEventsUsageDescription: Parse can read the selected code from other apps when you ask it to capture a selection.
+        NSScreenCaptureUsageDescription: Parse captures a region of the screen you drag so it can read the code in that area and translate it.
+        NSServices:
+          - NSMenuItem:
+              default: Explain with Parse
+            NSMessage: explainWithParse
+            NSPortName: Parse
+            NSSendTypes:
+              - public.utf8-plain-text
+              - NSStringPboardType
+    entitlements:
+      path: ParseApp/Parse.entitlements
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.parse.app
+        PRODUCT_NAME: Parse
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        GENERATE_INFOPLIST_FILE: NO
+        COMBINE_HIDPI_IMAGES: YES
+        ENABLE_HARDENED_RUNTIME: YES
+        ENABLE_APP_SANDBOX: NO
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "-"
+        SWIFT_EMIT_LOC_STRINGS: YES
+        DEAD_CODE_STRIPPING: YES
+        LD_RUNPATH_SEARCH_PATHS:
+          - "$(inherited)"
+          - "@executable_path/../Frameworks"
+      configs:
+        Debug:
+          SWIFT_OPTIMIZATION_LEVEL: "-Onone"
+        Release:
+          SWIFT_OPTIMIZATION_LEVEL: "-O"
+aggregateTargets:
+  InstallParse:
+    targets:
+      - Parse
+    buildScripts:
+      - name: Install Parse
+        path: Scripts/install-parse.sh
+        basedOnDependencyAnalysis: false
+schemes:
+  Parse:
+    build:
+      targets:
+        Parse: all
+        InstallParse: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+
